@@ -11,6 +11,7 @@ extension Module {
 
     public var functions: [Function]?
 
+    /// Creates a new instance from given values
     public init(
       tags: [Tag]? = nil,
       typedefs: [Typedef]? = nil,

@@ -1,10 +1,12 @@
 extension Module {
   public struct Version: Hashable {
-
+    /// The version number which these attributes apply to
     public var version: VersionTuple
 
+    /// The attributes that apply to this specific version
     public var items: TopLevelItems
 
+    /// Creates a new instance from given values
     public init(
       version: VersionTuple,
       items: TopLevelItems

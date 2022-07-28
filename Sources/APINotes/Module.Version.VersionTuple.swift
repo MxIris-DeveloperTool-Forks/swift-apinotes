@@ -1,9 +1,15 @@
 extension Module.Version {
   public struct VersionTuple {
+    /// The major part of the version number
     public var major: Int
+
+    /// The minor part of the version number
     public var minor: Int?
+
+    /// The patch part of the version number
     public var patch: Int?
 
+    /// Creates a new instance from given values
     public init(
       major: Int,
       minor: Int? = nil,

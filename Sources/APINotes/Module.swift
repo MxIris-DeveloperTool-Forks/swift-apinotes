@@ -13,6 +13,21 @@ public struct Module: Hashable {
 
   /// The versioned top level items definitions
   public var versions: [Version]?
+
+  /// Creates a new instance from given values
+  public init(
+    name: String,
+    availability: Availability? = nil,
+    inferImportAsMember: Bool? = nil,
+    items: TopLevelItems? = nil,
+    versions: [Version]? = nil
+  ) {
+    self.name = name
+    self.availability = availability
+    self.inferImportAsMember = inferImportAsMember
+    self.items = items
+    self.versions = versions
+  }
 }
 
 // MARK: - Conformance to Codable
