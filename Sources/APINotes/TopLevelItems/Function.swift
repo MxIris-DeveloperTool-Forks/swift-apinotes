@@ -4,14 +4,14 @@
 ///       Parameters:
 ///       - Position: 0
 ///         Nullability: O
-public final class Function: Entity {
+public struct Function: Entity, Hashable {
   /// Describes a function parameter and its position
   public struct IndexedParameter: Hashable {
     /// Describes the level of detail of the function parameter specification
     public enum Specification: Hashable {
       /// Full parameter specification available
-      case parameter(_ value: Parameter)
-      /// Only audited for nullability and (optionally) escaping
+      case parameter(_ value: Variable, isNoneEscaping: Bool? = nil)
+      /// Only audited for nullability and eventually escaping
       case nullability(_ value: Nullability, isNoneEscaping: Bool? = nil)
       /// Only audited for escaping
       case isNoneEscaping(_ value: Bool)
@@ -24,17 +24,25 @@ public final class Function: Entity {
     public var specification: Specification
   }
 
+  public var name: String
+
+  public var swiftName: String?
+
+  public var isSwiftPrivate: Bool?
+
+  public var availability: Availability?
+
   /// The function parameters, referenced by their 0-based `Position`
-  public let parameters: [IndexedParameter]?
+  public var parameters: [IndexedParameter]?
 
   /// Nullability of the parameters, unless otherwise specified in `parameters`
-  public let nullabilityOfParameters: [Nullability]?
+  public var nullabilityOfParameters: [Nullability]?
 
   /// The result type of this function, as a C type
-  public let resultType: String?
+  public var resultType: String?
 
   /// Nullability of the result
-  public let nullabilityOfResult: Nullability?
+  public var nullabilityOfResult: Nullability?
 
   /// Creates a new instance from given values
   public init(
@@ -47,38 +55,19 @@ public final class Function: Entity {
     resultType: String? = nil,
     nullabilityOfResult: Nullability? = nil
   ) {
+    self.name = name
+    self.swiftName = swiftName
+    self.isSwiftPrivate = isSwiftPrivate
+    self.availability = availability
     self.parameters = parameters
     self.nullabilityOfParameters = nullabilityOfParameters
     self.resultType = resultType
     self.nullabilityOfResult = nullabilityOfResult
-    super.init(
-      name: name,
-      swiftName: swiftName,
-      isSwiftPrivate: isSwiftPrivate,
-      availability: availability
-    )
   }
+}
 
-  // MARK: - Conformance to Hashable
-
-  public static func == (lhs: Function, rhs: Function) -> Bool {
-    lhs as Entity == rhs as Entity &&
-    lhs.parameters == rhs.parameters &&
-    lhs.nullabilityOfParameters == rhs.nullabilityOfParameters &&
-    lhs.resultType == rhs.resultType &&
-    lhs.nullabilityOfResult == rhs.nullabilityOfResult
-  }
-
-  public override func hash(into hasher: inout Hasher) {
-    super.hash(into: &hasher)
-    hasher.combine(parameters)
-    hasher.combine(nullabilityOfParameters)
-    hasher.combine(resultType)
-    hasher.combine(nullabilityOfResult)
-  }
-
-  // MARK: - Conformance to Codable
-
+// MARK: - Conformance to Codable
+extension Function: Codable {
   private enum CodingKeys: String, CodingKey {
     case parameters = "Parameters"
     case nullabilityOfParameters = "Nullability"
@@ -86,7 +75,7 @@ public final class Function: Entity {
     case nullabilityOfResult = "NullabilityOfRet"
   }
 
-  public required init(from decoder: Decoder) throws {
+  public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     parameters = try container.decodeIfPresent(
       [IndexedParameter].self, forKey: .parameters
@@ -100,10 +89,12 @@ public final class Function: Entity {
     nullabilityOfResult = try container.decodeIfPresent(
       Nullability.self, forKey: .nullabilityOfResult
     )
-    try super.init(from: decoder)
+    (name, swiftName, isSwiftPrivate, availability) = try Self.decodeEntity(
+      from: decoder
+    )
   }
 
-  public override func encode(to encoder: Encoder) throws {
+  public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
     try container.encodeIfPresent(parameters, forKey: .parameters)
     try container.encodeIfPresent(
@@ -113,11 +104,11 @@ public final class Function: Entity {
     try container.encodeIfPresent(
       nullabilityOfResult, forKey: .nullabilityOfResult
     )
-    try super.encode(to: encoder)
+    try encodeEntity(to: encoder)
   }
 }
 
-// MARK: - IndexedParameter Codable Support
+// MARK: - IndexedParameter Conformance to Codable
 extension Function.IndexedParameter: Codable {
   private enum CodingKeys: String, CodingKey {
     case position = "Position"
@@ -132,20 +123,17 @@ extension Function.IndexedParameter: Codable {
       Nullability.self, forKey: .nullability)
     let isNoneEscaping = try container.decodeIfPresent(
       Bool.self, forKey: .isNoneEscaping)
-    if let parameter = try? Function.Parameter(from: decoder) {
-      specification = .parameter(parameter)
+    if let parameter = try? Variable(from: decoder) {
+      specification = .parameter(parameter, isNoneEscaping: isNoneEscaping)
     } else if let nullability = nullability {
       specification = .nullability(nullability, isNoneEscaping: isNoneEscaping)
     } else if let isNoneEscaping = isNoneEscaping {
       specification = .isNoneEscaping(isNoneEscaping)
     } else {
-      throw DecodingError.valueNotFound(
-        Function.Parameter.self,
-        DecodingError.Context(
-          codingPath: decoder.codingPath,
-          debugDescription:
-            "Neither Parameter, Nullability nor Escaping specified"
-        ))
+      throw DecodingError.valueNotFound(Self.self, DecodingError.Context(
+        codingPath: decoder.codingPath,
+        debugDescription: "Neither Variable, Nullability nor Escaping specified"
+      ))
     }
   }
 
@@ -153,8 +141,9 @@ extension Function.IndexedParameter: Codable {
     var container = encoder.container(keyedBy: CodingKeys.self)
     try container.encode(position, forKey: .position)
     switch specification {
-    case let .parameter(parameter):
-      try parameter.encode(to: encoder)
+    case let .parameter(variable, isNoneEscaping):
+      try variable.encode(to: encoder)
+      try container.encodeIfPresent(isNoneEscaping, forKey: .isNoneEscaping)
     case let .nullability(nullability, isNoneEscaping):
       try container.encode(nullability, forKey: .nullability)
       try container.encodeIfPresent(isNoneEscaping, forKey: .isNoneEscaping)

@@ -1,5 +1,5 @@
 /// Describes API notes for types.
-public class TypeInfo: Entity {
+public protocol TypeInfo: Entity {
   /// The Swift type to which a given type is bridged.
   ///
   /// Reflects the swift_bridge attribute. Used for Objective-C class types
@@ -10,7 +10,7 @@ public class TypeInfo: Entity {
   ///
   ///     - Name: NSIndexSet
   ///       SwiftBridge: IndexSet
-  public let swiftBridge: String?
+  var swiftBridge: String? { get }
 
   /// The NSError domain for this type. Used for NSError code enums
   ///
@@ -20,63 +20,33 @@ public class TypeInfo: Entity {
   ///
   ///     - Name: MKErrorCode
   ///       NSErrorDomain: MKErrorDomain
-  public let errorDomain: String?
+  var errorDomain: String? { get }
+}
 
-  /// Creates a new instance from given values
-  public init(
-    name: String,
-    swiftName: String? = nil,
-    isSwiftPrivate: Bool? = nil,
-    availability: Availability? = nil,
-    swiftBridge: String? = nil,
-    errorDomain: String? = nil
+// MARK: - Codable Support
+private enum TypeInfoCodingKeys: String, CodingKey {
+  case swiftBridge = "SwiftBridge"
+  case errorDomain = "NSErrorDomain"
+}
+
+extension TypeInfo {
+  static internal func decodeTypeInfo(from decoder: Decoder) throws -> (
+    swiftBridge: String?,
+    errorDomain: String?
   ) {
-    self.swiftBridge = swiftBridge
-    self.errorDomain = errorDomain
-    super.init(
-      name: name,
-      swiftName: swiftName,
-      isSwiftPrivate: isSwiftPrivate,
-      availability: availability
-    )
-  }
-
-  // MARK: - Conformance to Hashable
-
-  public static func == (lhs: TypeInfo, rhs: TypeInfo) -> Bool {
-    lhs as Entity == rhs as Entity &&
-    lhs.swiftBridge == rhs.swiftBridge &&
-    lhs.errorDomain == rhs.errorDomain
-  }
-
-  public override func hash(into hasher: inout Hasher) {
-    super.hash(into: &hasher)
-    hasher.combine(swiftBridge)
-    hasher.combine(errorDomain)
-  }
-
-  // MARK: - Conformance to Codable
-
-  private enum CodingKeys: String, CodingKey {
-    case swiftBridge = "SwiftBridge"
-    case errorDomain = "NSErrorDomain"
-  }
-
-  public required init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-    swiftBridge = try container.decodeIfPresent(
+    let container = try decoder.container(keyedBy: TypeInfoCodingKeys.self)
+    let swiftBridge = try container.decodeIfPresent(
       String.self, forKey: .swiftBridge
     )
-    errorDomain = try container.decodeIfPresent(
+    let errorDomain = try container.decodeIfPresent(
       String.self, forKey: .errorDomain
     )
-    try super.init(from: decoder)
+    return (swiftBridge, errorDomain)
   }
 
-  public override func encode(to encoder: Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
+  internal func encodeTypeInfo(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: TypeInfoCodingKeys.self)
     try container.encodeIfPresent(swiftBridge, forKey: .swiftBridge)
     try container.encodeIfPresent(errorDomain, forKey: .errorDomain)
-    try super.encode(to: encoder)
   }
 }

@@ -1,5 +1,4 @@
 import XCTest
-import Foundation // JSON(DE|EN)coder
 
 @testable import APINotes
 

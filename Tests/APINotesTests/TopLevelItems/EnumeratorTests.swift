@@ -1,9 +1,8 @@
 import XCTest
-import Foundation // JSON(DE|EN)coder
 
 @testable import APINotes
 
-final class EntityTests: XCTestCase {
+final class EnumeratorTests: XCTestCase {
   func testDecoding() throws {
     let json = """
     {
@@ -16,7 +15,7 @@ final class EntityTests: XCTestCase {
     """
     let data = try XCTUnwrap(json.data(using: .utf8))
     let decoder = JSONDecoder()
-    let testStruct = try decoder.decode(Entity.self, from: data)
+    let testStruct = try decoder.decode(Enumerator.self, from: data)
     XCTAssertEqual(testStruct.name, "origin_name")
     XCTAssertEqual(testStruct.swiftName, "swiftName")
     XCTAssertEqual(testStruct.isSwiftPrivate, false)
@@ -26,7 +25,7 @@ final class EntityTests: XCTestCase {
   }
 
   func testEncoding() throws {
-    let testStruct = Entity(
+    let testStruct = Enumerator(
       name: "origin_name",
       swiftName: "swiftName",
       isSwiftPrivate: false,

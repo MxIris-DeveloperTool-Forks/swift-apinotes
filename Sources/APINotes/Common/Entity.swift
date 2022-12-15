@@ -3,70 +3,54 @@
 /// Swift language or even hidden from the interface.
 ///
 /// This is used as the base of all API notes.
-public class Entity: Hashable, Codable {
+public protocol Entity {
   /// The original name of the definition (in C language)
-  public let name: String
+  var name: String { get }
 
   /// The more appropriate name in Swift language.
   /// Equivalent to NS_SWIFT_NAME.
-  public let swiftName: String?
+  var swiftName: String? { get }
 
   /// Whether this entity is considered "private" to a Swift overlay.
   /// Equivalent to NS_REFINED_FOR_SWIFT.
-  public let isSwiftPrivate: Bool?
+  var isSwiftPrivate: Bool? { get }
 
   /// Specifies which platform the API is available on.
-  public let availability: Availability?
+  var availability: Availability? { get }
+}
 
-  /// Creates a new instance from given values
-  public init(
+// MARK: - Codable Support
+private enum EntityCodingKeys: String, CodingKey {
+  case name = "Name"
+  case swiftName = "SwiftName"
+  case isSwiftPrivate = "SwiftPrivate"
+}
+
+extension Entity {
+  /// A support function to decode all entity related values
+  static internal func decodeEntity(from decoder: Decoder) throws -> (
     name: String,
-    swiftName: String? = nil,
-    isSwiftPrivate: Bool? = nil,
-    availability: Availability? = nil
+    swiftName: String?,
+    isSwiftPrivate: Bool?,
+    availability: Availability?
   ) {
-    self.name = name
-    self.swiftName = swiftName
-    self.isSwiftPrivate = isSwiftPrivate
-    self.availability = availability
-  }
-
-  // MARK: - Conformance to Hashable
-
-  public static func == (lhs: Entity, rhs: Entity) -> Bool {
-    lhs.name == rhs.name &&
-    lhs.swiftName == rhs.swiftName &&
-    lhs.isSwiftPrivate == rhs.isSwiftPrivate &&
-    lhs.availability == rhs.availability
-  }
-
-  public func hash(into hasher: inout Hasher) {
-    hasher.combine(name)
-    hasher.combine(swiftName)
-    hasher.combine(isSwiftPrivate)
-    hasher.combine(availability)
-  }
-
-  // MARK: - Conformance to Codable
-
-  private enum CodingKeys: String, CodingKey {
-    case name = "Name"
-    case swiftName = "SwiftName"
-    case isSwiftPrivate = "SwiftPrivate"
-  }
-
-  public required init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-    name = try container.decode(String.self, forKey: .name)
-    swiftName = try container.decodeIfPresent(String.self, forKey: .swiftName)
-    isSwiftPrivate = try container.decodeIfPresent(
+    let container = try decoder.container(keyedBy: EntityCodingKeys.self)
+    let name = try container.decode(String.self, forKey: .name)
+    let swiftName = try container.decodeIfPresent(
+      String.self, forKey: .swiftName
+    )
+    let isSwiftPrivate = try container.decodeIfPresent(
       Bool.self, forKey: .isSwiftPrivate
     )
-    availability = try Availability.decodeAvailabilityIfPresent(from: decoder)
+    let availability = try Availability.decodeAvailabilityIfPresent(
+      from: decoder
+    )
+    return (name, swiftName, isSwiftPrivate, availability)
   }
 
-  public func encode(to encoder: Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
+  /// A support function to encode all entity related values
+  internal func encodeEntity(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: EntityCodingKeys.self)
     try container.encode(name, forKey: .name)
     try container.encodeIfPresent(swiftName, forKey: .swiftName)
     try container.encodeIfPresent(isSwiftPrivate, forKey: .isSwiftPrivate)

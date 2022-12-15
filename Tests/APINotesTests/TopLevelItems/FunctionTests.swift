@@ -1,5 +1,4 @@
 import XCTest
-import Foundation // JSON(DE|EN)coder
 
 @testable import APINotes
 
@@ -41,11 +40,10 @@ final class FunctionTests: XCTestCase {
     XCTAssertEqual(testStruct.parameters, [
       Function.IndexedParameter(
         position: 0,
-        specification: .parameter(Function.Parameter(
+        specification: .parameter(Variable(
           name: "input_param1",
-          type: "size_t",
-          isNoneEscaping: true
-        ))
+          type: "size_t"
+        ), isNoneEscaping: true)
       ),
       Function.IndexedParameter(
         position: 1,
@@ -63,11 +61,10 @@ final class FunctionTests: XCTestCase {
       parameters: [
         Function.IndexedParameter(
           position: 0,
-          specification: .parameter(Function.Parameter(
+          specification: .parameter(Variable(
             name: "input_param1",
-            type: "size_t",
-            isNoneEscaping: true
-          ))
+            type: "size_t"
+          ), isNoneEscaping: true)
         ),
         Function.IndexedParameter(
           position: 1,

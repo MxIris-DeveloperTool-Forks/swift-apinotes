@@ -40,7 +40,7 @@ extension Module.TopLevelItems: Encodable {
     case protocols = "Protocols"
   }
 
-  internal static func decodeTopLevelItemsIfPresent(
+  static internal func decodeTopLevelItemsIfPresent(
     from decoder: Decoder
   ) throws -> Module.TopLevelItems? {
     let container = try decoder.container(keyedBy: CodingKeys.self)

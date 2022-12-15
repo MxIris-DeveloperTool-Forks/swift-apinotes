@@ -20,19 +20,19 @@ public enum Availability: Hashable {
   case nonswift(message: String?)
 }
 
-// MARK: - Conformance to Encodable + Decodable Support
+// MARK: - Codable Support
 extension Availability: Encodable {
-  /// Specifies the keys used for encoding and decoding
   private enum CodingKeys: String, CodingKey {
     case availability = "Availability"
     case message = "AvailabilityMsg"
   }
 
-  internal static func decodeAvailabilityIfPresent(
+  static internal func decodeAvailabilityIfPresent(
     from decoder: Decoder
   ) throws -> Availability? {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     let type = try container.decodeIfPresent(String.self, forKey: .availability)
+    guard let type else { return nil }
     let message = try container.decodeIfPresent(String.self, forKey: .message)
     switch type {
     case "OSX": return .macOS
@@ -40,31 +40,35 @@ extension Availability: Encodable {
     case "available": return .available
     case "none": return .none(message: message)
     case "nonswift": return .nonswift(message: message)
-    default: return nil
+    default:
+      throw DecodingError.typeMismatch(
+        Availability.self,
+        DecodingError.Context(
+          codingPath: decoder.codingPath,
+          debugDescription: "\(type) is not an Availability specifier"
+        ))
     }
   }
 
   public func encode(to encoder: Encoder) throws {
-    let availability: String? = {
-      switch self {
-      case .macOS: return "OSX"
-      case .iOS: return "iOS"
-      case .available: return "available"
-      case .none: return "none"
-      case .nonswift: return "nonswift"
-      }
-    }()
+    let availability: String
+    switch self {
+    case .macOS: availability = "OSX"
+    case .iOS: availability = "iOS"
+    case .available: availability = "available"
+    case .none: availability = "none"
+    case .nonswift: availability = "nonswift"
+    }
 
-    let message: String? = {
-      switch self {
-      case let .none(message): return message
-      case let .nonswift(message): return message
-      default: return nil
-      }
-    }()
+    let message: String?
+    switch self {
+    case let .none(msg): message = msg
+    case let .nonswift(msg): message = msg
+    default: message = nil
+    }
 
     var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encodeIfPresent(availability, forKey: .availability)
+    try container.encode(availability, forKey: .availability)
     try container.encodeIfPresent(message, forKey: .message)
   }
 }

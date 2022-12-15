@@ -1,5 +1,5 @@
 /// Describes API notes data for a tag.
-public final class Tag: TypeInfo {
+public struct Tag: TypeInfo, Hashable {
   /// Defines the C enumeration kind (is it a bitmask, or closed enum)
   ///
   /// The payload for an enum_extensibility attribute.
@@ -12,10 +12,21 @@ public final class Tag: TypeInfo {
     case none // none
   }
 
-  /// The kind of enumeration of this tag is an enumeration
-  public let enumerationKind: EnumerationKind?
+  public var name: String
 
-  /// Creates a new instance from given values
+  public var swiftName: String?
+
+  public var isSwiftPrivate: Bool?
+
+  public var availability: Availability?
+
+  public var swiftBridge: String?
+
+  public var errorDomain: String?
+
+  /// The kind of enumeration of this tag is an enumeration
+  public var enumerationKind: EnumerationKind?
+
   public init(
     name: String,
     swiftName: String? = nil,
@@ -25,34 +36,27 @@ public final class Tag: TypeInfo {
     errorDomain: String? = nil,
     enumerationKind: EnumerationKind? = nil
   ) {
+    self.name = name
+    self.swiftName = swiftName
+    self.isSwiftPrivate = isSwiftPrivate
+    self.availability = availability
+    self.swiftBridge = swiftBridge
+    self.errorDomain = errorDomain
     self.enumerationKind = enumerationKind
-    super.init(
-      name: name,
-      swiftName: swiftName,
-      isSwiftPrivate: isSwiftPrivate,
-      availability: availability,
-      swiftBridge: swiftBridge,
-      errorDomain: errorDomain
-    )
+  }
+}
+
+// MARK: - Conformance to Codable
+extension Tag: Codable {
+  private enum CodingKeys: String, CodingKey {
+    case enumExtensibility = "EnumExtensibility"
+    case flagEnum = "FlagEnum"
+    case enumKind = "EnumKind"
   }
 
-  // MARK: - Conformance to Hashable
-
-  public static func == (lhs: Tag, rhs: Tag) -> Bool {
-    lhs as TypeInfo == rhs as TypeInfo &&
-    lhs.enumerationKind == rhs.enumerationKind
-  }
-
-  public override func hash(into hasher: inout Hasher) {
-    super.hash(into: &hasher)
-    hasher.combine(enumerationKind)
-  }
-
-  // MARK: - Conformance to Codable
-
-  public required init(from decoder: Decoder) throws {
+  public init(from decoder: Decoder) throws {
     // Try decoding the "complete" definition of enum + flag first, and only
-    // if it fails decoding, fallback to the convenience kind decoding.
+    // if it fails then fallback to the convenience kind decoding.
     if let enumerationKind = try Self.enumerationKind(from: decoder) {
       self.enumerationKind = enumerationKind
     } else if let enumerationKind = try Self.convenienceKind(from: decoder) {
@@ -60,10 +64,13 @@ public final class Tag: TypeInfo {
     } else {
       self.enumerationKind = nil
     }
-    try super.init(from: decoder)
+    (name, swiftName, isSwiftPrivate, availability) = try Self.decodeEntity(
+      from: decoder
+    )
+    (swiftBridge, errorDomain) = try Self.decodeTypeInfo(from: decoder)
   }
 
-  public override func encode(to encoder: Encoder) throws {
+  public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
     switch enumerationKind {
     case let .open(isFlagEnum):
@@ -76,7 +83,8 @@ public final class Tag: TypeInfo {
       try container.encode("none", forKey: .enumExtensibility)
     default: break
     }
-    try super.encode(to: encoder)
+    try encodeTypeInfo(to: encoder)
+    try encodeEntity(to: encoder)
   }
 }
 
@@ -85,28 +93,22 @@ public final class Tag: TypeInfo {
 /// Syntactic sugar for Extensibility and Flag Enumeration
 extension Tag.EnumerationKind {
   /// EnumExtensibility: open, FlagEnum: false
-  public static var coreFoundationEnum: Self {
+  static public var coreFoundationEnum: Self {
     .open(isFlagEnum: false)
   }
   /// EnumExtensibility: closed, FlagEnum: false
-  public static var coreFoundationClosedEnum: Self {
+  static public var coreFoundationClosedEnum: Self {
     .closed(isFlagEnum: false)
   }
   /// EnumExtensibility: open, FlagEnum: true
-  public static var coreFoundationOptions: Self {
+  static public var coreFoundationOptions: Self {
     .open(isFlagEnum: true)
   }
 }
 
 // MARK: - Codable Support
 extension Tag {
-  private enum CodingKeys: String, CodingKey {
-    case enumExtensibility = "EnumExtensibility"
-    case flagEnum = "FlagEnum"
-    case enumKind = "EnumKind"
-  }
-
-  fileprivate static func enumerationKind(
+  static fileprivate func enumerationKind(
     from decoder: Decoder
   ) throws -> Tag.EnumerationKind? {
     let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -134,13 +136,14 @@ extension Tag {
     }
   }
 
-  fileprivate static func convenienceKind(
+  static fileprivate func convenienceKind(
     from decoder: Decoder
   ) throws -> Tag.EnumerationKind? {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     guard let enumKind = try container.decodeIfPresent(
       String.self, forKey: .enumKind
     ) else { return nil }
+
     switch enumKind {
     case "NSEnum", "CFEnum":
       return .coreFoundationEnum

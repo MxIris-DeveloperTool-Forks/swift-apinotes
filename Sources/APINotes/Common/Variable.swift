@@ -1,12 +1,21 @@
 /// API notes for a variable/property.
-public class Variable: Entity {
+public struct Variable: Entity, Hashable {
+  /// The original name of the definition (in C language)
+  public var name: String
+  /// The more appropriate name in Swift language.
+  /// Equivalent to NS_SWIFT_NAME.
+  public var swiftName: String?
+  /// Whether this entity is considered "private" to a Swift overlay.
+  /// Equivalent to NS_REFINED_FOR_SWIFT.
+  public var isSwiftPrivate: Bool?
+  /// Specifies which platform the API is available on.
+  public var availability: Availability?
   /// The C type of the variable, as a string.
-  public let type: String
+  public var type: String
   /// The kind of nullability for this property.
   /// `nil` if this variable has not been audited for nullability.
-  public let nullability: Nullability?
+  public var nullability: Nullability?
 
-  /// Creates a new instance from given values
   public init(
     name: String,
     swiftName: String? = nil,
@@ -15,50 +24,37 @@ public class Variable: Entity {
     type: String,
     nullability: Nullability? = nil
   ) {
+    self.name = name
+    self.swiftName = swiftName
+    self.isSwiftPrivate = isSwiftPrivate
+    self.availability = availability
     self.type = type
     self.nullability = nullability
-    super.init(
-      name: name,
-      swiftName: swiftName,
-      isSwiftPrivate: isSwiftPrivate,
-      availability: availability
-    )
   }
+}
 
-  // MARK: - Conformance to Hashable
-
-  public static func == (lhs: Variable, rhs: Variable) -> Bool {
-    lhs as Entity == rhs as Entity &&
-    lhs.type == rhs.type &&
-    lhs.nullability == rhs.nullability
-  }
-
-  public override func hash(into hasher: inout Hasher) {
-    super.hash(into: &hasher)
-    hasher.combine(type)
-    hasher.combine(nullability)
-  }
-
-  // MARK: - Conformance to Codable
-
+// MARK: - Conformance to Codable
+extension Variable: Codable {
   private enum CodingKeys: String, CodingKey {
     case nullability = "Nullability"
     case type = "Type"
   }
 
-  public required init(from decoder: Decoder) throws {
+  public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     type = try container.decode(String.self, forKey: .type)
     nullability = try container.decodeIfPresent(
       Nullability.self, forKey: .nullability
     )
-    try super.init(from: decoder)
+    (name, swiftName, isSwiftPrivate, availability) = try Self.decodeEntity(
+      from: decoder
+    )
   }
 
-  public override func encode(to encoder: Encoder) throws {
+  public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
     try container.encodeIfPresent(nullability, forKey: .nullability)
     try container.encode(type, forKey: .type)
-    try super.encode(to: encoder)
+    try encodeEntity(to: encoder)
   }
 }
