@@ -1,14 +1,14 @@
 extension Module {
   public struct Version: Hashable {
     /// The version number which these attributes apply to
-    public var version: VersionTuple
+    public var version: Tuple
 
     /// The attributes that apply to this specific version
     public var items: TopLevelItems
 
     /// Creates a new instance from given values
     public init(
-      version: VersionTuple,
+      version: Tuple,
       items: TopLevelItems
     ) {
       self.version = version
@@ -25,7 +25,7 @@ extension Module.Version: Codable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
-    version = try container.decode(VersionTuple.self, forKey: .version)
+    version = try container.decode(Tuple.self, forKey: .version)
     guard let items = try Module.TopLevelItems.decodeTopLevelItemsIfPresent(
       from: decoder
     ) else {

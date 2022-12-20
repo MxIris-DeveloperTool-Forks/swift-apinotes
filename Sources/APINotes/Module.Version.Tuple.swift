@@ -1,5 +1,5 @@
 extension Module.Version {
-  public struct VersionTuple {
+  public struct Tuple {
     /// The major part of the version number
     public var major: Int
 
@@ -23,7 +23,7 @@ extension Module.Version {
 }
 
 // MARK: - Conformance to Hashable & Comparable
-extension Module.Version.VersionTuple: Hashable, Comparable {
+extension Module.Version.Tuple: Hashable, Comparable {
   public static func == (lhs: Self, rhs: Self) -> Bool {
     lhs.major == rhs.major &&
     (lhs.minor ?? 0) == (rhs.minor ?? 0) && // Nil implies zero
@@ -43,7 +43,7 @@ extension Module.Version.VersionTuple: Hashable, Comparable {
 }
 
 // MARK: - Conformance to LosslessStringConvertible
-extension Module.Version.VersionTuple: LosslessStringConvertible {
+extension Module.Version.Tuple: LosslessStringConvertible {
   public var description: String {
     var string = String(major)
     minor.map { string.append(".\($0)") }
@@ -67,7 +67,7 @@ extension Module.Version.VersionTuple: LosslessStringConvertible {
 }
 
 // MARK: - Conformance to Codable
-extension Module.Version.VersionTuple: Codable {
+extension Module.Version.Tuple: Codable {
   public init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
     let versionString = try container.decode(String.self)

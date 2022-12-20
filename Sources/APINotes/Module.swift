@@ -3,6 +3,7 @@ public struct Module: Hashable {
   /// Note that this is always the name of a top-level module, even within a
   /// private API notes file.
   public var name: String
+
   /// Specifies which platform or language the API is available on
   public var availability: Availability?
 

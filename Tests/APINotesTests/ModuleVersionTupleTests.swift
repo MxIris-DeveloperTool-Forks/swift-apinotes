@@ -2,43 +2,43 @@ import XCTest
 
 @testable import APINotes
 
-final class ModuleVersionTupleTests: XCTestCase {
+final class ModuleTupleTests: XCTestCase {
 
   func testEquatable() throws {
     XCTAssertEqual(
-      Module.Version.VersionTuple(major: 1, minor: nil, patch: nil),
-      Module.Version.VersionTuple(major: 1, minor:   0, patch:   0)
+      Module.Version.Tuple(major: 1, minor: nil, patch: nil),
+      Module.Version.Tuple(major: 1, minor:   0, patch:   0)
     )
     XCTAssertEqual(
-      Module.Version.VersionTuple(major: 1, minor: 2, patch: nil),
-      Module.Version.VersionTuple(major: 1, minor: 2, patch:   0)
+      Module.Version.Tuple(major: 1, minor: 2, patch: nil),
+      Module.Version.Tuple(major: 1, minor: 2, patch:   0)
     )
     XCTAssertEqual(
-      Module.Version.VersionTuple(major: 1, minor: 2, patch: 3),
-      Module.Version.VersionTuple(major: 1, minor: 2, patch: 3)
+      Module.Version.Tuple(major: 1, minor: 2, patch: 3),
+      Module.Version.Tuple(major: 1, minor: 2, patch: 3)
     )
   }
 
   func testComparable() throws {
     XCTAssert(
-      Module.Version.VersionTuple(major: 1, minor: nil, patch: nil)
-      < Module.Version.VersionTuple(major: 2, minor: 0, patch:   0)
+      Module.Version.Tuple(major: 1, minor: nil, patch: nil)
+      < Module.Version.Tuple(major: 2, minor: 0, patch:   0)
     )
     XCTAssert(
-      Module.Version.VersionTuple(major: 1, minor: nil, patch: nil)
-      < Module.Version.VersionTuple(major: 1, minor: 1, patch:   0)
+      Module.Version.Tuple(major: 1, minor: nil, patch: nil)
+      < Module.Version.Tuple(major: 1, minor: 1, patch:   0)
     )
     XCTAssert(
-      Module.Version.VersionTuple(major: 1, minor: 1, patch: nil)
-      < Module.Version.VersionTuple(major: 1, minor: 2, patch: 0)
+      Module.Version.Tuple(major: 1, minor: 1, patch: nil)
+      < Module.Version.Tuple(major: 1, minor: 2, patch: 0)
     )
     XCTAssert(
-      Module.Version.VersionTuple(major: 1, minor: 2, patch: nil)
-      < Module.Version.VersionTuple(major: 1, minor: 2, patch: 1)
+      Module.Version.Tuple(major: 1, minor: 2, patch: nil)
+      < Module.Version.Tuple(major: 1, minor: 2, patch: 1)
     )
     XCTAssert(
-      Module.Version.VersionTuple(major: 1, minor: 2, patch: 3)
-      < Module.Version.VersionTuple(major: 1, minor: 2, patch: 4)
+      Module.Version.Tuple(major: 1, minor: 2, patch: 3)
+      < Module.Version.Tuple(major: 1, minor: 2, patch: 4)
     )
   }
 
@@ -115,13 +115,13 @@ final class ModuleVersionTupleTests: XCTestCase {
   }
 }
 
-extension ModuleVersionTupleTests {
+extension ModuleTupleTests {
   fileprivate struct Test: Codable {
     enum CodingKeys: String, CodingKey {
       case version = "Version"
     }
-    var version: Module.Version.VersionTuple
-    init(_ version: Module.Version.VersionTuple) {
+    var version: Module.Version.Tuple
+    init(_ version: Module.Version.Tuple) {
       self.version = version
     }
   }
