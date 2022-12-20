@@ -24,7 +24,7 @@ public struct Tag: TypeInfo, Hashable {
 
   public var errorDomain: String?
 
-  /// The kind of enumeration of this tag is an enumeration
+  /// The kind of enumeration if this tag is an enumeration
   public var enumerationKind: EnumerationKind?
 
   public init(
