@@ -7,7 +7,7 @@ final class VariableTests: XCTestCase {
     let json = """
     {
       "Name" : "origin_name",
-      "Nullability" : "N",
+      "Nullability" : "Nonnull",
       "Type" : "char *"
     }
     """
@@ -16,7 +16,7 @@ final class VariableTests: XCTestCase {
     let testStruct = try decoder.decode(Variable.self, from: data)
     XCTAssertEqual(testStruct.name, "origin_name")
     XCTAssertEqual(testStruct.type, "char *")
-    XCTAssertEqual(testStruct.nullability, .nonnull)
+    XCTAssertEqual(testStruct.nullability, .nonnull())
     XCTAssertNil(testStruct.swiftName)
     XCTAssertNil(testStruct.isSwiftPrivate)
     XCTAssertNil(testStruct.availability)
@@ -26,7 +26,7 @@ final class VariableTests: XCTestCase {
     let testStruct = Variable(
       name: "origin_name",
       type: "char *",
-      nullability: .nonnull
+      nullability: .nonnull()
     )
 
     let encoder = JSONEncoder()

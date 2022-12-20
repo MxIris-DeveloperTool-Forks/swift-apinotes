@@ -8,10 +8,10 @@ final class FunctionTests: XCTestCase {
     {
       "Name" : "function_name",
       "Nullability" : [
-        "O",
-        "N"
+        "Optional",
+        "Nonnull"
       ],
-      "NullabilityOfRet" : "N",
+      "NullabilityOfRet" : "Nonnull",
       "Parameters" : [
         {
           "Name" : "input_param1",
@@ -21,7 +21,7 @@ final class FunctionTests: XCTestCase {
         },
         {
           "NoEscape" : false,
-          "Nullability" : "N",
+          "Nullability" : "Nonnull",
           "Position" : 1
         }
       ],
@@ -33,10 +33,10 @@ final class FunctionTests: XCTestCase {
     let testStruct = try decoder.decode(Function.self, from: data)
     XCTAssertEqual(testStruct.name, "function_name")
     XCTAssertEqual(
-      testStruct.nullabilityOfParameters, [.optional, .nonnull]
+      testStruct.nullabilityOfParameters, [.optional(), .nonnull()]
     )
     XCTAssertEqual(testStruct.resultType, "char *")
-    XCTAssertEqual(testStruct.nullabilityOfResult, .nonnull)
+    XCTAssertEqual(testStruct.nullabilityOfResult, .nonnull())
     XCTAssertEqual(testStruct.parameters, [
       Function.IndexedParameter(
         position: 0,
@@ -47,7 +47,7 @@ final class FunctionTests: XCTestCase {
       ),
       Function.IndexedParameter(
         position: 1,
-        specification: .nullability(.nonnull, isNoneEscaping: false)
+        specification: .nullability(.nonnull(), isNoneEscaping: false)
       )
     ])
     XCTAssertNil(testStruct.swiftName)
@@ -68,12 +68,12 @@ final class FunctionTests: XCTestCase {
         ),
         Function.IndexedParameter(
           position: 1,
-          specification: .nullability(.nonnull, isNoneEscaping: false)
+          specification: .nullability(.nonnull(), isNoneEscaping: false)
         )
       ],
-      nullabilityOfParameters: [.optional, .nonnull],
+      nullabilityOfParameters: [.optional(), .nonnull()],
       resultType: "char *",
-      nullabilityOfResult: .nonnull
+      nullabilityOfResult: .nonnull()
     )
 
     let encoder = JSONEncoder()

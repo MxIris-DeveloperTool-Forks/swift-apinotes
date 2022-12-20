@@ -13,7 +13,7 @@ final class NullabilityTests: XCTestCase {
     }
     """.data(using: .utf8))
     let entity = try JSONDecoder().decode(Test.self, from: json)
-    XCTAssertEqual(entity.nullability, .nonnull)
+    XCTAssertEqual(entity.nullability, .scalar(representation: .long))
   }
 
   func testSDecoding() throws {
@@ -23,8 +23,23 @@ final class NullabilityTests: XCTestCase {
     }
     """.data(using: .utf8))
     let entity = try JSONDecoder().decode(Test.self, from: json)
-    XCTAssertEqual(entity.nullability, .nonnull)
+    XCTAssertEqual(entity.nullability, .scalar(representation: .short))
   }
+
+  func testScalarEncoding() throws {
+    let entity = Test(.scalar(representation: .long))
+
+    let encoder = JSONEncoder()
+    encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
+    let json = try String(data: encoder.encode(entity), encoding: .utf8)
+    XCTAssertEqual(json, """
+    {
+      "Nullability" : "Scalar"
+    }
+    """)
+  }
+
+  // MARK: Optional
 
   func testNonnullDecoding() throws {
     let json = try XCTUnwrap("""
@@ -33,7 +48,7 @@ final class NullabilityTests: XCTestCase {
     }
     """.data(using: .utf8))
     let entity = try JSONDecoder().decode(Test.self, from: json)
-    XCTAssertEqual(entity.nullability, .nonnull)
+    XCTAssertEqual(entity.nullability, .nonnull(representation: .long))
   }
 
   func testNDecoding() throws {
@@ -43,11 +58,11 @@ final class NullabilityTests: XCTestCase {
     }
     """.data(using: .utf8))
     let entity = try JSONDecoder().decode(Test.self, from: json)
-    XCTAssertEqual(entity.nullability, .nonnull)
+    XCTAssertEqual(entity.nullability, .nonnull(representation: .short))
   }
 
   func testNonnullEncoding() throws {
-    let entity = Test(.nonnull)
+    let entity = Test(.nonnull(representation: .long))
 
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
@@ -68,7 +83,7 @@ final class NullabilityTests: XCTestCase {
     }
     """.data(using: .utf8))
     let entity = try JSONDecoder().decode(Test.self, from: json)
-    XCTAssertEqual(entity.nullability, .optional)
+    XCTAssertEqual(entity.nullability, .optional(representation: .long))
   }
 
   func testODecoding() throws {
@@ -78,11 +93,11 @@ final class NullabilityTests: XCTestCase {
     }
     """.data(using: .utf8))
     let entity = try JSONDecoder().decode(Test.self, from: json)
-    XCTAssertEqual(entity.nullability, .optional)
+    XCTAssertEqual(entity.nullability, .optional(representation: .short))
   }
 
   func testOptionalEncoding() throws {
-    let entity = Test(.optional)
+    let entity = Test(.optional(representation: .long))
 
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
@@ -103,7 +118,7 @@ final class NullabilityTests: XCTestCase {
     }
     """.data(using: .utf8))
     let entity = try JSONDecoder().decode(Test.self, from: json)
-    XCTAssertEqual(entity.nullability, .unspecified)
+    XCTAssertEqual(entity.nullability, .unspecified(representation: .long))
   }
 
   func testUDecoding() throws {
@@ -113,11 +128,11 @@ final class NullabilityTests: XCTestCase {
     }
     """.data(using: .utf8))
     let entity = try JSONDecoder().decode(Test.self, from: json)
-    XCTAssertEqual(entity.nullability, .unspecified)
+    XCTAssertEqual(entity.nullability, .unspecified(representation: .short))
   }
 
   func testUnspecifiedEncoding() throws {
-    let entity = Test(.unspecified)
+    let entity = Test(.unspecified(representation: .long))
 
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
