@@ -22,6 +22,12 @@ public struct Function: Entity, Hashable {
 
     /// The level of detail of the specification
     public var specification: Specification
+
+    // Creates a new parameter from given values
+    public init(position: Int, specification: Specification) {
+      self.position = position
+      self.specification = specification
+    }
   }
 
   public var name: String
