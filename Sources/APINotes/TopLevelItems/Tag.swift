@@ -3,7 +3,7 @@ public struct Tag: TypeInfo, Hashable {
   /// Defines the C enumeration kind (is it a bitmask, or closed enum)
   ///
   /// The payload for an enum_extensibility attribute.
-  public enum EnumerationKind: Hashable {
+  public enum EnumerationExtensibility: Hashable {
     /// Defines an open or extensible enumeration
     case open(isFlagEnum: Bool)
     /// Defines a closed or not extensible enumeration
@@ -25,7 +25,7 @@ public struct Tag: TypeInfo, Hashable {
   public var errorDomain: String?
 
   /// The kind of enumeration if this tag is an enumeration
-  public var enumerationKind: EnumerationKind?
+  public var extensibility: EnumerationExtensibility?
 
   public init(
     name: String,
@@ -34,7 +34,7 @@ public struct Tag: TypeInfo, Hashable {
     availability: Availability? = nil,
     swiftBridge: String? = nil,
     errorDomain: String? = nil,
-    enumerationKind: EnumerationKind? = nil
+    extensibility: EnumerationExtensibility? = nil
   ) {
     self.name = name
     self.swiftName = swiftName
@@ -42,7 +42,7 @@ public struct Tag: TypeInfo, Hashable {
     self.availability = availability
     self.swiftBridge = swiftBridge
     self.errorDomain = errorDomain
-    self.enumerationKind = enumerationKind
+    self.extensibility = extensibility
   }
 }
 
@@ -57,12 +57,12 @@ extension Tag: Codable {
   public init(from decoder: Decoder) throws {
     // Try decoding the "complete" definition of enum + flag first, and only
     // if it fails then fallback to the convenience kind decoding.
-    if let enumerationKind = try Self.enumerationKind(from: decoder) {
-      self.enumerationKind = enumerationKind
-    } else if let enumerationKind = try Self.convenienceKind(from: decoder) {
-      self.enumerationKind = enumerationKind
+    if let extensibility = try Self.extensibility(from: decoder) {
+      self.extensibility = extensibility
+    } else if let extensibility = try Self.enumerationKind(from: decoder) {
+      self.extensibility = extensibility
     } else {
-      self.enumerationKind = nil
+      self.extensibility = nil
     }
     (name, swiftName, isSwiftPrivate, availability) = try Self.decodeEntity(
       from: decoder
@@ -72,7 +72,7 @@ extension Tag: Codable {
 
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
-    switch enumerationKind {
+    switch extensibility {
     case let .open(isFlagEnum):
       try container.encode("open", forKey: .enumExtensibility)
       try container.encode(isFlagEnum, forKey: .flagEnum)
@@ -91,7 +91,7 @@ extension Tag: Codable {
 // MARK: - Convenience Enum Kind
 
 /// Syntactic sugar for Extensibility and Flag Enumeration
-extension Tag.EnumerationKind {
+extension Tag.EnumerationExtensibility {
   /// EnumExtensibility: open, FlagEnum: false
   static public var coreFoundationEnum: Self {
     .open(isFlagEnum: false)
@@ -108,9 +108,9 @@ extension Tag.EnumerationKind {
 
 // MARK: - Codable Support
 extension Tag {
-  static fileprivate func enumerationKind(
+  static fileprivate func extensibility(
     from decoder: Decoder
-  ) throws -> Tag.EnumerationKind? {
+  ) throws -> Tag.EnumerationExtensibility? {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     guard let extensibility = try container.decodeIfPresent(
       String.self, forKey: .enumExtensibility
@@ -124,10 +124,10 @@ extension Tag {
       let isFlagEnum = try container.decode(Bool.self, forKey: .flagEnum)
       return .closed(isFlagEnum: isFlagEnum)
     case "none":
-      return Tag.EnumerationKind.none
+      return Tag.EnumerationExtensibility.none
     default:
       throw DecodingError.typeMismatch(
-        Tag.EnumerationKind.self,
+        Tag.EnumerationExtensibility.self,
         DecodingError.Context(
           codingPath: decoder.codingPath,
           debugDescription: "\(extensibility) is not a valid enumeration " +
@@ -136,9 +136,9 @@ extension Tag {
     }
   }
 
-  static fileprivate func convenienceKind(
+  static fileprivate func enumerationKind(
     from decoder: Decoder
-  ) throws -> Tag.EnumerationKind? {
+  ) throws -> Tag.EnumerationExtensibility? {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     guard let enumKind = try container.decodeIfPresent(
       String.self, forKey: .enumKind
@@ -152,10 +152,10 @@ extension Tag {
     case "NSOptions", "CFOptions":
       return .coreFoundationOptions
     case "none":
-      return Tag.EnumerationKind.none
+      return Tag.EnumerationExtensibility.none
     default:
       throw DecodingError.typeMismatch(
-        Tag.EnumerationKind.self,
+        Tag.EnumerationExtensibility.self,
         DecodingError.Context(
           codingPath: decoder.codingPath,
           debugDescription: "\(enumKind) is not a valid convenience " +

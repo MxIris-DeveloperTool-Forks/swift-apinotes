@@ -16,7 +16,7 @@ final class TagTests: XCTestCase {
     """.data(using: .utf8))
     let tag = try JSONDecoder().decode(Tag.self, from: json)
     XCTAssertEqual(tag.name, "origin_name")
-    XCTAssertEqual(tag.enumerationKind, .open(isFlagEnum: true))
+    XCTAssertEqual(tag.extensibility, .open(isFlagEnum: true))
     XCTAssertNil(tag.swiftBridge)
     XCTAssertNil(tag.errorDomain)
     XCTAssertNil(tag.swiftName)
@@ -27,7 +27,7 @@ final class TagTests: XCTestCase {
   func testOpenIsFlagEncoding() throws {
     let tag = Tag(
       name: "origin_name",
-      enumerationKind: .open(isFlagEnum: true)
+      extensibility: .open(isFlagEnum: true)
     )
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
@@ -51,7 +51,7 @@ final class TagTests: XCTestCase {
     """.data(using: .utf8))
     let tag = try JSONDecoder().decode(Tag.self, from: json)
     XCTAssertEqual(tag.name, "origin_name")
-    XCTAssertEqual(tag.enumerationKind, .open(isFlagEnum: false))
+    XCTAssertEqual(tag.extensibility, .open(isFlagEnum: false))
     XCTAssertNil(tag.swiftBridge)
     XCTAssertNil(tag.errorDomain)
     XCTAssertNil(tag.swiftName)
@@ -62,7 +62,7 @@ final class TagTests: XCTestCase {
   func testOpenIsNotFlagEncoding() throws {
     let tag = Tag(
       name: "origin_name",
-      enumerationKind: .open(isFlagEnum: false)
+      extensibility: .open(isFlagEnum: false)
     )
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
@@ -88,7 +88,7 @@ final class TagTests: XCTestCase {
     """.data(using: .utf8))
     let tag = try JSONDecoder().decode(Tag.self, from: json)
     XCTAssertEqual(tag.name, "origin_name")
-    XCTAssertEqual(tag.enumerationKind, .closed(isFlagEnum: true))
+    XCTAssertEqual(tag.extensibility, .closed(isFlagEnum: true))
     XCTAssertNil(tag.swiftBridge)
     XCTAssertNil(tag.errorDomain)
     XCTAssertNil(tag.swiftName)
@@ -99,7 +99,7 @@ final class TagTests: XCTestCase {
   func testClosedIsFlagEncoding() throws {
     let tag = Tag(
       name: "origin_name",
-      enumerationKind: .closed(isFlagEnum: true)
+      extensibility: .closed(isFlagEnum: true)
     )
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
@@ -123,7 +123,7 @@ final class TagTests: XCTestCase {
     """.data(using: .utf8))
     let tag = try JSONDecoder().decode(Tag.self, from: json)
     XCTAssertEqual(tag.name, "origin_name")
-    XCTAssertEqual(tag.enumerationKind, .closed(isFlagEnum: false))
+    XCTAssertEqual(tag.extensibility, .closed(isFlagEnum: false))
     XCTAssertNil(tag.swiftBridge)
     XCTAssertNil(tag.errorDomain)
     XCTAssertNil(tag.swiftName)
@@ -134,7 +134,7 @@ final class TagTests: XCTestCase {
   func testClosedIsNotFlagEncoding() throws {
     let tag = Tag(
       name: "origin_name",
-      enumerationKind: .closed(isFlagEnum: false)
+      extensibility: .closed(isFlagEnum: false)
     )
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
@@ -160,7 +160,7 @@ final class TagTests: XCTestCase {
     """.data(using: .utf8))
     let tag = try JSONDecoder().decode(Tag.self, from: json)
     XCTAssertEqual(tag.name, "origin_name")
-    XCTAssertEqual(tag.enumerationKind, .some(.none))
+    XCTAssertEqual(tag.extensibility, .some(.none))
     XCTAssertNil(tag.swiftBridge)
     XCTAssertNil(tag.errorDomain)
     XCTAssertNil(tag.swiftName)
@@ -171,7 +171,7 @@ final class TagTests: XCTestCase {
   func testNoneEncoding() throws {
     let tag = Tag(
       name: "origin_name",
-      enumerationKind: .some(.none)
+      extensibility: .some(.none)
     )
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
@@ -197,7 +197,7 @@ final class TagTests: XCTestCase {
     let decoder = JSONDecoder()
     let tag = try decoder.decode(Tag.self, from: data)
     XCTAssertEqual(tag.name, "origin_name")
-    XCTAssertEqual(tag.enumerationKind, .open(isFlagEnum: false))
+    XCTAssertEqual(tag.extensibility, .open(isFlagEnum: false))
     XCTAssertNil(tag.swiftBridge)
     XCTAssertNil(tag.errorDomain)
     XCTAssertNil(tag.swiftName)
@@ -216,7 +216,7 @@ final class TagTests: XCTestCase {
     let decoder = JSONDecoder()
     let tag = try decoder.decode(Tag.self, from: data)
     XCTAssertEqual(tag.name, "origin_name")
-    XCTAssertEqual(tag.enumerationKind, .open(isFlagEnum: false))
+    XCTAssertEqual(tag.extensibility, .open(isFlagEnum: false))
     XCTAssertNil(tag.swiftBridge)
     XCTAssertNil(tag.errorDomain)
     XCTAssertNil(tag.swiftName)
@@ -235,7 +235,7 @@ final class TagTests: XCTestCase {
     let decoder = JSONDecoder()
     let tag = try decoder.decode(Tag.self, from: data)
     XCTAssertEqual(tag.name, "origin_name")
-    XCTAssertEqual(tag.enumerationKind, .closed(isFlagEnum: false))
+    XCTAssertEqual(tag.extensibility, .closed(isFlagEnum: false))
     XCTAssertNil(tag.swiftBridge)
     XCTAssertNil(tag.errorDomain)
     XCTAssertNil(tag.swiftName)
@@ -254,7 +254,7 @@ final class TagTests: XCTestCase {
     let decoder = JSONDecoder()
     let tag = try decoder.decode(Tag.self, from: data)
     XCTAssertEqual(tag.name, "origin_name")
-    XCTAssertEqual(tag.enumerationKind, .closed(isFlagEnum: false))
+    XCTAssertEqual(tag.extensibility, .closed(isFlagEnum: false))
     XCTAssertNil(tag.swiftBridge)
     XCTAssertNil(tag.errorDomain)
     XCTAssertNil(tag.swiftName)
@@ -273,7 +273,7 @@ final class TagTests: XCTestCase {
     let decoder = JSONDecoder()
     let tag = try decoder.decode(Tag.self, from: data)
     XCTAssertEqual(tag.name, "origin_name")
-    XCTAssertEqual(tag.enumerationKind, .open(isFlagEnum: true))
+    XCTAssertEqual(tag.extensibility, .open(isFlagEnum: true))
     XCTAssertNil(tag.swiftBridge)
     XCTAssertNil(tag.errorDomain)
     XCTAssertNil(tag.swiftName)
@@ -292,7 +292,7 @@ final class TagTests: XCTestCase {
     let decoder = JSONDecoder()
     let tag = try decoder.decode(Tag.self, from: data)
     XCTAssertEqual(tag.name, "origin_name")
-    XCTAssertEqual(tag.enumerationKind, .open(isFlagEnum: true))
+    XCTAssertEqual(tag.extensibility, .open(isFlagEnum: true))
     XCTAssertNil(tag.swiftBridge)
     XCTAssertNil(tag.errorDomain)
     XCTAssertNil(tag.swiftName)
@@ -315,7 +315,7 @@ final class TagTests: XCTestCase {
     let decoder = JSONDecoder()
     let tag = try decoder.decode(Tag.self, from: data)
     XCTAssertEqual(tag.name, "origin_name")
-    XCTAssertEqual(tag.enumerationKind, .closed(isFlagEnum: true))
+    XCTAssertEqual(tag.extensibility, .closed(isFlagEnum: true))
     XCTAssertNil(tag.swiftBridge)
     XCTAssertNil(tag.errorDomain)
     XCTAssertNil(tag.swiftName)
