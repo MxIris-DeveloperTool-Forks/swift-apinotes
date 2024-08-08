@@ -2,7 +2,7 @@
 
 A package to describe `.apinotes`-Files in Swift `Codable` fashion.
 
-### (LLVM) References
+### `llvm/clang` references
 
 - [Documentation](https://clang.llvm.org/docs/APINotes.html)
 - [Header](https://github.com/llvm/llvm-project/blob/main/clang/include/clang/APINotes)
