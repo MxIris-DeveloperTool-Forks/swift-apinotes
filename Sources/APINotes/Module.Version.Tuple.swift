@@ -45,10 +45,15 @@ extension Module.Version.Tuple: Hashable, Comparable {
 // MARK: - Conformance to LosslessStringConvertible
 extension Module.Version.Tuple: LosslessStringConvertible {
   public var description: String {
-    var string = String(major)
-    minor.map { string.append(".\($0)") }
-    patch.map { string.append(".\($0)") }
-    return string
+    if let minor {
+      if let patch {
+        "\(major).\(minor).\(patch)"
+      } else {
+        "\(major).\(minor)"
+      }
+    } else {
+      "\(major)"
+    }
   }
 
   public init?(_ description: String) {

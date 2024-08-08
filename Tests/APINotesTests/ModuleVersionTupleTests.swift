@@ -20,36 +20,32 @@ final class ModuleTupleTests: XCTestCase {
   }
 
   func testComparable() throws {
-    XCTAssert(
-      Module.Version.Tuple(major: 1, minor: nil, patch: nil)
-      < Module.Version.Tuple(major: 2, minor: 0, patch:   0)
+    XCTAssertLessThan(
+      Module.Version.Tuple(major: 1, minor: nil, patch: nil),
+      Module.Version.Tuple(major: 2, minor: 0, patch:   0)
     )
-    XCTAssert(
-      Module.Version.Tuple(major: 1, minor: nil, patch: nil)
-      < Module.Version.Tuple(major: 1, minor: 1, patch:   0)
+    XCTAssertLessThan(
+      Module.Version.Tuple(major: 1, minor: nil, patch: nil),
+      Module.Version.Tuple(major: 1, minor: 1, patch:   0)
     )
-    XCTAssert(
-      Module.Version.Tuple(major: 1, minor: 1, patch: nil)
-      < Module.Version.Tuple(major: 1, minor: 2, patch: 0)
+    XCTAssertLessThan(
+      Module.Version.Tuple(major: 1, minor: 1, patch: nil),
+      Module.Version.Tuple(major: 1, minor: 2, patch: 0)
     )
-    XCTAssert(
-      Module.Version.Tuple(major: 1, minor: 2, patch: nil)
-      < Module.Version.Tuple(major: 1, minor: 2, patch: 1)
+    XCTAssertLessThan(
+      Module.Version.Tuple(major: 1, minor: 2, patch: nil),
+      Module.Version.Tuple(major: 1, minor: 2, patch: 1)
     )
-    XCTAssert(
-      Module.Version.Tuple(major: 1, minor: 2, patch: 3)
-      < Module.Version.Tuple(major: 1, minor: 2, patch: 4)
+    XCTAssertLessThan(
+      Module.Version.Tuple(major: 1, minor: 2, patch: 3),
+      Module.Version.Tuple(major: 1, minor: 2, patch: 4)
     )
   }
 
   // MARK: Major
 
   func testMajorDecoding() throws {
-    let json = try XCTUnwrap("""
-    {
-      "Version" : "1"
-    }
-    """.data(using: .utf8))
+    let json = try XCTUnwrap(#"{"Version":"1"}"#.data(using: .utf8))
     let test = try JSONDecoder().decode(Test.self, from: json)
     XCTAssertEqual(test.version, .init(major: 1))
   }
@@ -57,23 +53,14 @@ final class ModuleTupleTests: XCTestCase {
   func testMajorEncoding() throws {
     let test = Test(.init(major: 1))
     let encoder = JSONEncoder()
-    encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
     let json = try String(data: encoder.encode(test), encoding: .utf8)
-    XCTAssertEqual(json, """
-    {
-      "Version" : "1"
-    }
-    """)
+    XCTAssertEqual(json, #"{"Version":"1"}"#)
   }
 
   // MARK: Minor
 
   func testMinorDecoding() throws {
-    let json = try XCTUnwrap("""
-    {
-      "Version" : "1.2"
-    }
-    """.data(using: .utf8))
+    let json = try XCTUnwrap(#"{"Version":"1.2"}"#.data(using: .utf8))
     let test = try JSONDecoder().decode(Test.self, from: json)
     XCTAssertEqual(test.version, .init(major: 1, minor: 2))
   }
@@ -81,23 +68,14 @@ final class ModuleTupleTests: XCTestCase {
   func testMinorEncoding() throws {
     let test = Test(.init(major: 1, minor: 2))
     let encoder = JSONEncoder()
-    encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
     let json = try String(data: encoder.encode(test), encoding: .utf8)
-    XCTAssertEqual(json, """
-    {
-      "Version" : "1.2"
-    }
-    """)
+    XCTAssertEqual(json,  #"{"Version":"1.2"}"#)
   }
 
   // MARK: Patch
 
   func testPatchDecoding() throws {
-    let json = try XCTUnwrap("""
-    {
-      "Version" : "1.2.3"
-    }
-    """.data(using: .utf8))
+    let json = try XCTUnwrap(#"{"Version":"1.2.3"}"#.data(using: .utf8))
     let test = try JSONDecoder().decode(Test.self, from: json)
     XCTAssertEqual(test.version, .init(major: 1, minor: 2, patch: 3))
   }
@@ -105,13 +83,8 @@ final class ModuleTupleTests: XCTestCase {
   func testPatchEncoding() throws {
     let test = Test(.init(major: 1, minor: 2, patch: 3))
     let encoder = JSONEncoder()
-    encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
     let json = try String(data: encoder.encode(test), encoding: .utf8)
-    XCTAssertEqual(json, """
-    {
-      "Version" : "1.2.3"
-    }
-    """)
+    XCTAssertEqual(json, #"{"Version":"1.2.3"}"#)
   }
 }
 
