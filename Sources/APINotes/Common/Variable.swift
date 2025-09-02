@@ -42,7 +42,7 @@ extension Variable: Codable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
-    type = try container.decode(String.self, forKey: .type)
+    type = try container.decodeIfPresent(String.self, forKey: .type)
     nullability = try container.decodeIfPresent(
       Nullability.self, forKey: .nullability
     )
