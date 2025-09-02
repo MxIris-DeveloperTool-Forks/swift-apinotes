@@ -152,8 +152,8 @@ final class TypedefTests: XCTestCase {
     let json = String(data: data, encoding: .utf8)
     XCTAssertEqual(json, """
     {
-      "Name" : "origin_name",
       "NSErrorDomain" : "ErrorDomain",
+      "Name" : "origin_name",
       "SwiftBridge" : "NonNSSwiftBridge"
     }
     """)

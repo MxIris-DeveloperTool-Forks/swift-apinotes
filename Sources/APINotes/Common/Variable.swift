@@ -11,7 +11,7 @@ public struct Variable: Entity, Hashable {
   /// Specifies which platform the API is available on.
   public var availability: Availability?
   /// The C type of the variable, as a string.
-  public var type: String
+  public var type: String?
   /// The kind of nullability for this property.
   /// `nil` if this variable has not been audited for nullability.
   public var nullability: Nullability?
@@ -21,7 +21,7 @@ public struct Variable: Entity, Hashable {
     swiftName: String? = nil,
     isSwiftPrivate: Bool? = nil,
     availability: Availability? = nil,
-    type: String,
+    type: String? = nil,
     nullability: Nullability? = nil
   ) {
     self.name = name
