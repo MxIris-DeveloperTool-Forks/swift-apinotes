@@ -1,5 +1,5 @@
 import Foundation
-private import MetaCodable
+import MetaCodable
 private import Yams
 
 @Codable

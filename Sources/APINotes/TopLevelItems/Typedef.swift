@@ -1,4 +1,4 @@
-private import MetaCodable
+import MetaCodable
 
 /// Describes API notes data for a typedef.
 @Codable

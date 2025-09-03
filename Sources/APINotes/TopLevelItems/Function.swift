@@ -1,4 +1,4 @@
-private import MetaCodable
+import MetaCodable
 
 /// Describes a function parameter.
 ///

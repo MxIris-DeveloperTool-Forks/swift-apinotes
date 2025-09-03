@@ -18,6 +18,7 @@ let package = Package(
             name: "APINotes",
             dependencies: [
                 .product(name: "MetaCodable", package: "MetaCodable"),
+                .product(name: "HelperCoders", package: "MetaCodable"),
                 .product(name: "Yams", package: "Yams"),
             ]
         ),
