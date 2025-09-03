@@ -1,23 +1,49 @@
-import MetaCodable
+private import MetaCodable
+
+private struct NameCoder: HelperCoder {
+    typealias Coded = String
+
+    func decode(from decoder: any Decoder) throws -> String {
+        guard let value = try? String(from: decoder) else { return "" }
+        return value
+    }
+
+    func encode(_ value: String, to encoder: any Encoder) throws {
+        guard !value.isEmpty else { return }
+        try value.encode(to: encoder)
+    }
+}
 
 @Codable
 @Inherits(decodable: false, encodable: false)
 public class CommonEntity {
     @CodedAt("Name")
-    @Default("")
+    @CodedBy(NameCoder())
     public var name: String
+
     @CodedAt("SwiftName")
     public var swiftName: String?
+
     @CodedAt("SwiftPrivate")
     public var isSwiftPrivate: Bool?
-    @CodedAt
-    @Default(Availability?.none)
+
+    @CodedAt("Availability")
     public var availability: Availability?
 
-    public init(name: String, swiftName: String? = nil, isSwiftPrivate: Bool? = nil, availability: Availability? = nil) {
+    @CodedAt("AvailabilityMsg")
+    public var availabilityMessage: String?
+
+    public init(
+        name: String,
+        swiftName: String? = nil,
+        isSwiftPrivate: Bool? = nil,
+        availability: Availability? = nil,
+        availabilityMessage: String? = nil
+    ) {
         self.name = name
         self.swiftName = swiftName
         self.isSwiftPrivate = isSwiftPrivate
         self.availability = availability
+        self.availabilityMessage = availabilityMessage
     }
 }

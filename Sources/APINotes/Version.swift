@@ -1,21 +1,30 @@
-import MetaCodable
+private import MetaCodable
 
 @Codable
+@MemberInit
 public struct Version {
     /// The version number which these attributes apply to
     @CodedAt("Version")
     public var version: Tuple
 
-    /// The attributes that apply to this specific version
-    @CodedAt
-    public var items: TopLevelItems
+    @CodedAt("Classes")
+    public var classes: [ObjCClass]?
 
-    /// Creates a new instance from given values
-    public init(
-        version: Tuple,
-        items: TopLevelItems
-    ) {
-        self.version = version
-        self.items = items
-    }
+    @CodedAt("Protocols")
+    public var protocols: [ObjCProtocol]?
+
+    @CodedAt("Tags")
+    public var tags: [Tag]?
+
+    @CodedAt("Typedefs")
+    public var typedefs: [Typedef]?
+
+    @CodedAt("Globals")
+    public var globals: [Variable]?
+
+    @CodedAt("Enumerators")
+    public var enumerators: [Enumerator]?
+
+    @CodedAt("Functions")
+    public var functions: [Function]?
 }

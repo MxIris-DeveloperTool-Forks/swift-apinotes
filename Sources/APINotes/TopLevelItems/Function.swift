@@ -1,4 +1,4 @@
-import MetaCodable
+private import MetaCodable
 
 /// Describes a function parameter.
 ///
@@ -10,7 +10,7 @@ import MetaCodable
 public class Function: CommonEntity {
     /// Describes a function parameter and its position
     @Codable
-    public class IndexedParameter: Parameter {
+    public final class IndexedParameter: Parameter {
         /// The function parameter position
         @CodedAt("Position")
         public var position: Int

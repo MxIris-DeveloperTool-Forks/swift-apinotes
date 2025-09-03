@@ -1,12 +1,12 @@
-import MetaCodable
+private import MetaCodable
 
 @Codable
-public class ObjCProperty: Variable {
+public final class ObjCProperty: Variable {
+    @CodedAt("PropertyKind")
+    public var kind: ObjCMemberKind
+
     @CodedAt("SwiftImportAsAccessors")
     public var swiftImportAsAccessor: Bool?
-
-    @CodedAt("PropertyKind")
-    public var kind: ObjCMemberKind?
 
     public init(
         name: String,
@@ -15,8 +15,10 @@ public class ObjCProperty: Variable {
         availability: Availability? = nil,
         type: String? = nil,
         nullability: Nullability? = nil,
-        swiftImportAsAccessor: Bool? = nil
+        kind: ObjCMemberKind,
+        swiftImportAsAccessor: Bool? = nil,
     ) {
+        self.kind = kind
         self.swiftImportAsAccessor = swiftImportAsAccessor
         super.init(name: name, swiftName: swiftName, isSwiftPrivate: isSwiftPrivate, availability: availability, type: type, nullability: nullability)
     }

@@ -1,4 +1,4 @@
-import MetaCodable
+private import MetaCodable
 
 /// API notes for a variable/property.
 @Codable

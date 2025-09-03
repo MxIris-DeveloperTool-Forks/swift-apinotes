@@ -1,4 +1,4 @@
-import MetaCodable
+private import MetaCodable
 
 @Codable
 public class Parameter: Variable {

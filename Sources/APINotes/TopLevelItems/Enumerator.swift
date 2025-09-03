@@ -1,8 +1,4 @@
-/// Describes API notes data for an enumerator.
-///
-/// Enumerators refer to enum cases.
-
-import MetaCodable
+private import MetaCodable
 
 @Codable
-public class Enumerator: CommonEntity {}
+public final class Enumerator: CommonEntity {}

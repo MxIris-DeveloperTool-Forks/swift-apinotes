@@ -1,21 +1,25 @@
 private import MetaCodable
 
-/// Describes API notes data for a typedef.
 @Codable
-public final class Typedef: CommonType {
-    @CodedAt("SwiftWrapper")
-    public var swiftWrapper: SwiftWrapper?
+public class ObjCContext: CommonType {
+    @CodedAt("Methods")
+    var methods: [ObjCMethod]?
 
-    public init(
+    @CodedAt("Properties")
+    var properties: [ObjCProperty]?
+
+    init(
         name: String,
         swiftName: String? = nil,
         isSwiftPrivate: Bool? = nil,
         availability: Availability? = nil,
         swiftBridge: String? = nil,
         errorDomain: String? = nil,
-        swiftWrapper: SwiftWrapper? = nil
+        methods: [ObjCMethod]? = nil,
+        properties: [ObjCProperty]? = nil
     ) {
-        self.swiftWrapper = swiftWrapper
+        self.methods = methods
+        self.properties = properties
         super.init(
             name: name,
             swiftName: swiftName,
@@ -26,3 +30,9 @@ public final class Typedef: CommonType {
         )
     }
 }
+
+@Codable
+public final class ObjCClass: ObjCContext {}
+
+@Codable
+public final class ObjCProtocol: ObjCContext {}
